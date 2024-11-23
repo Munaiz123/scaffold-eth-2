@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import RandomWord from "./RandomWorld";
 import type { NextPage } from "next";
@@ -48,6 +48,7 @@ function WalletInfo() {
         <WalletAction></WalletAction>
         <WalletBalance address={address as `0x${string}`}></WalletBalance>
         <TokenInfo address={address as `0x${string}`}></TokenInfo>
+        <ApiData address={address as `0x${string}`}></ApiData>
       </div>
     );
   if (isConnecting)
@@ -198,6 +199,77 @@ function TokenBalance(params: { address: `0x${string}` }) {
   if (isLoading) return <div>Fetching balance…</div>;
   if (isError) return <div>Error fetching balance</div>;
   return <div>Balance: {balance}</div>;
+}
+
+function ApiData(params: { address: `0x${string}` }) {
+  return (
+    <div className="card w-96 bg-primary text-primary-content mt-4">
+      <div className="card-body">
+        <h2 className="card-title">Testing API Coupling</h2>
+        <TokenAddressFromApi></TokenAddressFromApi>
+        <RequestTokens address={params.address}></RequestTokens>
+      </div>
+    </div>
+  );
+}
+
+function TokenAddressFromApi() {
+  const [data, setData] = useState<{ result: string }>();
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/contractAddress")
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      });
+  }, []);
+
+  if (isLoading) return <p>Loading token address from API...</p>;
+  if (!data) return <p>No token address information</p>;
+
+  return (
+    <div>
+      <p>Token address from API: {data.result}</p>
+    </div>
+  );
+}
+
+function RequestTokens(params: { address: string }) {
+  const [data, setData] = useState<{ result: boolean }>();
+  const [isLoading, setLoading] = useState(false);
+
+  const body = { address: params.address };
+
+  if (isLoading) return <p>Requesting tokens from API...</p>;
+  if (!data)
+    return (
+      <button
+        className="btn btn-active btn-neutral"
+        onClick={() => {
+          setLoading(true);
+          fetch("http://localhost:3001/mint-tokens", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          })
+            .then(res => res.json())
+            .then(data => {
+              setData(data);
+              setLoading(false);
+            });
+        }}
+      >
+        Request tokens
+      </button>
+    );
+
+  return (
+    <div>
+      <p>Result from API: {data.result ? "worked" : "failed"}</p>
+    </div>
+  );
 }
 
 export default Home;
