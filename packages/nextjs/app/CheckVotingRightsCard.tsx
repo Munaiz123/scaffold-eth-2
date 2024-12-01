@@ -52,7 +52,7 @@ export default function CheckVotingRightsCard() {
       </button>
 
       {votingRights && (
-        <div className="p-4">
+        <div>
           <h3 className="text-lg font-bold">
             Status: {votingRights.hasRights ? "Has Voting Rights" : "No Voting Rights"}
           </h3>
