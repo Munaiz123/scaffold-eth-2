@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CastVoteCard from "./CastVoteCard";
 import CheckVotingRightsCard from "./CheckVotingRightsCard";
 // import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import ERC20Card from "./ERC20Card";
@@ -13,6 +14,7 @@ const Home: NextPage = () => {
       <div className="flex items-center flex-col flex-grow pt-10">
         <ERC20Card />
         <CheckVotingRightsCard />
+        <CastVoteCard />
 
         <div className="px-5"></div>
       </div>
